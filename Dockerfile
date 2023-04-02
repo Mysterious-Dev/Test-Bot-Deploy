@@ -1,25 +1,18 @@
-FROM node:19.7.0-alpine as development
+FROM node:19.7.0-alpine
 
+# set work dir
 WORKDIR /usr/src/bot
 
-COPY package.json .
+# copy package.json
+COPY package*.json ./
 
-RUN npm install
-
-COPY . .
-
-RUN npm run build
-
-FROM node:19.7.0-alpine as production
-
-ENV NODE_ENV production
-
-WORKDIR /usr/src/bot
-
-COPY package.json .
-
+# install deps
 RUN npm install --only=production
 
-COPY --from=development /usr/src/bot/dist ./dist
+# copy dist folder to /usr/app/dist
+ADD dist ./dist
+
+# set env to prod
+ENV NODE_ENV production
 
 CMD ["node", "dist/index.js"]
